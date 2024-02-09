@@ -9,8 +9,10 @@ import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.model.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HelloWorld {
     public static void main(String[] args) {
@@ -19,7 +21,9 @@ public class HelloWorld {
         var course2 = new Course("Python", "Amazing Python course");
         course1.setId(1L);
         course2.setId(2L);
-        List<Course> courses = List.of(course1, course2);
+        List<Course> courses = new ArrayList<>();
+        courses.add(course1);
+        courses.add(course2);
 
         var user1 = new User("petya", "petya@mail.ru", "12345678");
         var user2 = new User("vasya", "vasya@mail.ru", "87654321");
@@ -41,7 +45,15 @@ public class HelloWorld {
 
         app.get("/courses", ctx -> {
             var header = "Курсы по программированию";
-            var page = new CoursesPage(courses, header);
+            var term = ctx.queryParam("term");
+            List<Course> filteredCourses = new ArrayList<>();
+            if (term != null) {
+                filteredCourses = courses.stream().filter(c -> c.getName().contains(term) | c.getDescription().contains(term))
+                        .toList();
+            } else {
+                filteredCourses = courses;
+            }
+            var page = new CoursesPage(filteredCourses, header, term);
             ctx.render("courses/index.jte", Collections.singletonMap("page", page));
         });
 
