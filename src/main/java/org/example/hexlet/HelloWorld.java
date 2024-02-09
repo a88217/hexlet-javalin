@@ -2,7 +2,6 @@ package org.example.hexlet;
 
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
-import io.javalin.validation.ValidationError;
 import io.javalin.validation.ValidationException;
 import org.example.hexlet.dto.courses.BuildCoursePage;
 import org.example.hexlet.dto.courses.CoursePage;
@@ -14,6 +13,7 @@ import org.example.hexlet.model.Course;
 import org.example.hexlet.model.User;
 import org.example.hexlet.repository.CourseRepository;
 import org.example.hexlet.repository.UserRepository;
+import org.example.hexlet.utils.NamedRoutes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,14 +38,14 @@ public class HelloWorld {
             config.plugins.enableDevLogging();
         });
         // Описываем, что загрузится по адресу /
-        app.get("/", ctx -> ctx.render("index.jte"));
+        app.get(NamedRoutes.rootPath(), ctx -> ctx.render("index.jte"));
 
         app.get("/hello", ctx -> {
             var name = ctx.queryParamAsClass("name", String.class).getOrDefault("World");
             ctx.result("Hello, " + name +  "!");
         });
 
-        app.get("/courses", ctx -> {
+        app.get(NamedRoutes.coursesPath(), ctx -> {
             var header = "Курсы по программированию";
             var term = ctx.queryParam("term");
             List<Course> filteredCourses = new ArrayList<>();
@@ -58,12 +58,12 @@ public class HelloWorld {
             ctx.render("courses/index.jte", Collections.singletonMap("page", page));
         });
 
-        app.get("/courses/build", ctx -> {
+        app.get(NamedRoutes.buildCoursePath(), ctx -> {
             var page = new BuildCoursePage();
             ctx.render("courses/build.jte", Collections.singletonMap("page", page));
         });
 
-        app.post("/courses", ctx -> {
+        app.post(NamedRoutes.coursesPath(), ctx -> {
             var name = ctx.formParam("name");
             var description = ctx.formParam("description");
             try {
@@ -74,14 +74,14 @@ public class HelloWorld {
                         .get();
                 var course = new Course(name, description);
                 CourseRepository.save(course);
-                ctx.redirect("/courses");
+                ctx.redirect(NamedRoutes.coursesPath());
             } catch (ValidationException e) {
                 var page = new BuildCoursePage(name, description, e.getErrors());
                 ctx.render("courses/build.jte", Collections.singletonMap("page", page));
             }
         });
 
-        app.get("/courses/{id}", ctx -> {
+        app.get(NamedRoutes.coursePath("{id}"), ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var course = CourseRepository.find(id)
                     .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
@@ -89,17 +89,17 @@ public class HelloWorld {
             ctx.render("courses/show.jte", Collections.singletonMap("page", page));
         });
 
-        app.get("/users", ctx -> {
+        app.get(NamedRoutes.usersPath(), ctx -> {
             var page = new UsersPage(UserRepository.getEntities());
             ctx.render("users/index.jte", Collections.singletonMap("page", page));
         });
 
-        app.get("/users/build", ctx -> {
+        app.get(NamedRoutes.buildUserPath(), ctx -> {
             var page = new BuildUserPage();
             ctx.render("users/build.jte", Collections.singletonMap("page", page));
         });
 
-        app.post("/users", ctx -> {
+        app.post(NamedRoutes.usersPath(), ctx -> {
             var name = ctx.formParam("name");
             var email = ctx.formParam("email").trim().toLowerCase();;
             try {
@@ -110,14 +110,14 @@ public class HelloWorld {
                         .get();
                 var user = new User(name, email, password);
                 UserRepository.save(user);
-                ctx.redirect("/users");
+                ctx.redirect(NamedRoutes.usersPath());
             } catch (ValidationException e) {
                 var page = new BuildUserPage(name, email, e.getErrors());
                 ctx.render("users/build.jte", Collections.singletonMap("page", page));
             }
         });
 
-        app.get("/users/{id}", ctx -> {
+        app.get(NamedRoutes.userPath("{id}"), ctx -> {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var user = UserRepository.find(id)
                     .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
