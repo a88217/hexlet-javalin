@@ -3,6 +3,7 @@
 
 @template.layout.page(content = @`
     <h1>${page.getHeader()}</h1>
+
     <div>
         <form action="/courses" method="get">
             <input type="search" name="term" value="${page.getTerm()}" />
@@ -19,4 +20,6 @@
             </div>
         @endfor
     @endif
+
+    <a href="/courses/build">New Course</a>
 `)
