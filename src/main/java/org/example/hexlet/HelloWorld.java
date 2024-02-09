@@ -3,6 +3,7 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
+import org.example.hexlet.controller.UsersController;
 import org.example.hexlet.dto.courses.BuildCoursePage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
@@ -89,41 +90,50 @@ public class HelloWorld {
             ctx.render("courses/show.jte", Collections.singletonMap("page", page));
         });
 
-        app.get(NamedRoutes.usersPath(), ctx -> {
-            var page = new UsersPage(UserRepository.getEntities());
-            ctx.render("users/index.jte", Collections.singletonMap("page", page));
-        });
+        app.get("/users", UsersController::index);
+        app.get("/users/{id}", UsersController::show);
+        app.get("/users/build", UsersController::build);
+        app.post("/users", UsersController::create);
+        app.get("/users/{id}/edit", UsersController::edit);
+        app.post("/users/{id}", UsersController::update);
+        app.delete("/users", UsersController::destroy);
 
-        app.get(NamedRoutes.buildUserPath(), ctx -> {
-            var page = new BuildUserPage();
-            ctx.render("users/build.jte", Collections.singletonMap("page", page));
-        });
 
-        app.post(NamedRoutes.usersPath(), ctx -> {
-            var name = ctx.formParam("name");
-            var email = ctx.formParam("email").trim().toLowerCase();;
-            try {
-                var passwordConfirmation = ctx.formParam("passwordConfirmation");
-                var password = ctx.formParamAsClass("password", String.class)
-                        .check(value -> value.equals(passwordConfirmation), "Пароли не совпадают")
-                        .check(value -> value.length() >= 8, "Короткий пароль!")
-                        .get();
-                var user = new User(name, email, password);
-                UserRepository.save(user);
-                ctx.redirect(NamedRoutes.usersPath());
-            } catch (ValidationException e) {
-                var page = new BuildUserPage(name, email, e.getErrors());
-                ctx.render("users/build.jte", Collections.singletonMap("page", page));
-            }
-        });
-
-        app.get(NamedRoutes.userPath("{id}"), ctx -> {
-            var id = ctx.pathParamAsClass("id", Long.class).get();
-            var user = UserRepository.find(id)
-                    .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
-            var page = new UserPage(user);
-            ctx.render("users/show.jte", Collections.singletonMap("page", page));
-        });
+//        app.get(NamedRoutes.usersPath(), ctx -> {
+//            var page = new UsersPage(UserRepository.getEntities());
+//            ctx.render("users/index.jte", Collections.singletonMap("page", page));
+//        });
+//
+//        app.get(NamedRoutes.buildUserPath(), ctx -> {
+//            var page = new BuildUserPage();
+//            ctx.render("users/build.jte", Collections.singletonMap("page", page));
+//        });
+//
+//        app.post(NamedRoutes.usersPath(), ctx -> {
+//            var name = ctx.formParam("name");
+//            var email = ctx.formParam("email").trim().toLowerCase();;
+//            try {
+//                var passwordConfirmation = ctx.formParam("passwordConfirmation");
+//                var password = ctx.formParamAsClass("password", String.class)
+//                        .check(value -> value.equals(passwordConfirmation), "Пароли не совпадают")
+//                        .check(value -> value.length() >= 8, "Короткий пароль!")
+//                        .get();
+//                var user = new User(name, email, password);
+//                UserRepository.save(user);
+//                ctx.redirect(NamedRoutes.usersPath());
+//            } catch (ValidationException e) {
+//                var page = new BuildUserPage(name, email, e.getErrors());
+//                ctx.render("users/build.jte", Collections.singletonMap("page", page));
+//            }
+//        });
+//
+//        app.get(NamedRoutes.userPath("{id}"), ctx -> {
+//            var id = ctx.pathParamAsClass("id", Long.class).get();
+//            var user = UserRepository.find(id)
+//                    .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
+//            var page = new UserPage(user);
+//            ctx.render("users/show.jte", Collections.singletonMap("page", page));
+//        });
 
 
 

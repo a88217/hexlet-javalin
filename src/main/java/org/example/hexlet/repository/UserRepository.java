@@ -12,8 +12,14 @@ public class UserRepository {
 
     public static void save(User user) {
         // Формируется идентификатор
-        user.setId((long) entities.size() + 1);
-        entities.add(user);
+        if (user.getId() == null) {
+            user.setId((long) entities.size() + 1);
+            entities.add(user);
+        } else {
+            UserRepository.find(user.getId()).get().setName(user.getName());
+            UserRepository.find(user.getId()).get().setEmail(user.getEmail());
+            UserRepository.find(user.getId()).get().setPassword(user.getPassword());
+        }
     }
 
     public static Optional<User> find(Long id) {
@@ -25,5 +31,10 @@ public class UserRepository {
 
     public static List<User> getEntities() {
         return entities;
+    }
+
+    public static void delete(Long id) {
+        var user = UserRepository.find(id).get();
+        entities.remove(user);
     }
 }
