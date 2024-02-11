@@ -10,9 +10,13 @@ public class CourseRepository {
     private static List<Course> entities = new ArrayList<Course>();
 
     public static void save(Course course) {
-        // Формируется идентификатор
-        course.setId((long) entities.size() + 1);
-        entities.add(course);
+        if (course.getId() == null) {
+            course.setId((long) entities.size() + 1);
+            entities.add(course);
+        } else {
+            UserRepository.find(course.getId()).get().setName(course.getName());
+            UserRepository.find(course.getId()).get().setEmail(course.getDescription());
+        }
     }
 
     public static List<Course> search(String term) {
@@ -31,5 +35,10 @@ public class CourseRepository {
 
     public static List<Course> getEntities() {
         return entities;
+    }
+
+    public static void delete(Long id) {
+        var course = CourseRepository.find(id).get();
+        entities.remove(course);
     }
 }

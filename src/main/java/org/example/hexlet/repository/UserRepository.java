@@ -11,7 +11,7 @@ public class UserRepository {
     private static List<User> entities = new ArrayList<User>();
 
     public static void save(User user) {
-        // Формируется идентификатор
+
         if (user.getId() == null) {
             user.setId((long) entities.size() + 1);
             entities.add(user);
