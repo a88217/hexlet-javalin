@@ -29,6 +29,8 @@ public class CoursesController {
             filteredCourses = CourseRepository.getEntities();
         }
         var page = new CoursesPage(filteredCourses, header, term);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        page.setFlashType(ctx.consumeSessionAttribute("flashType"));
         ctx.render("courses/index.jte", Collections.singletonMap("page", page));
     }
 
@@ -56,9 +58,15 @@ public class CoursesController {
                     .get();
             var course = new Course(name, description);
             CourseRepository.save(course);
+            ctx.sessionAttribute("flash", "Course has been created!");
+            ctx.sessionAttribute("flashType", "success");
             ctx.redirect(NamedRoutes.coursesPath());
         } catch (ValidationException e) {
             var page = new BuildCoursePage(name, description, e.getErrors());
+            ctx.sessionAttribute("flash", "Course has not been created!");
+            ctx.sessionAttribute("flashType", "error");
+            page.setFlash(ctx.consumeSessionAttribute("flash"));
+            page.setFlashType(ctx.consumeSessionAttribute("flashType"));
             ctx.render("courses/build.jte", Collections.singletonMap("page", page));
         }
     }

@@ -3,7 +3,9 @@
 @param UsersPage page
 
 @template.layout.page(
+page = page,
 content = @`
+
     <a href="${NamedRoutes.buildUserPath()}">New User</a>
     @for(var user : page.getUsers())
         <div>

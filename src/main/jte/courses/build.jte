@@ -2,8 +2,10 @@
 @import org.example.hexlet.utils.NamedRoutes
 @param BuildCoursePage page
 
+@template.layout.page(
+page = page,
+content = @`
 
-@template.layout.page(content = @`
     @if(page.getErrors() != null)
         <ul>
             @for(var validator : page.getErrors().values())

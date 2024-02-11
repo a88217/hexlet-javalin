@@ -2,7 +2,10 @@
 @import org.example.hexlet.utils.NamedRoutes
 @param CoursesPage page
 
-@template.layout.page(content = @`
+@template.layout.page(
+page = page,
+content = @`
+
     <h1>${page.getHeader()}</h1>
 
     <div>

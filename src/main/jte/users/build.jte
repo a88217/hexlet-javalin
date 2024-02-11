@@ -2,7 +2,9 @@
 @import org.example.hexlet.utils.NamedRoutes
 @param BuildUserPage page
 
-@template.layout.page(content = @`
+@template.layout.page(
+page = page,
+content = @`
 @if(page.getErrors() != null)
     <ul>
         @for(var validator : page.getErrors().values())
