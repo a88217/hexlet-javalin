@@ -1,5 +1,6 @@
 package org.example.hexlet.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ import io.javalin.http.NotFoundResponse;
 
 public class CoursesController {
 
-    public static void index(Context ctx) {
+    public static void index(Context ctx)  throws SQLException {
         var header = "Курсы по программированию";
         var term = ctx.queryParam("term");
         List<Course> filteredCourses = new ArrayList<>();
@@ -34,7 +35,7 @@ public class CoursesController {
         ctx.render("courses/index.jte", Collections.singletonMap("page", page));
     }
 
-    public static void show(Context ctx) {
+    public static void show(Context ctx)  throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var course = CourseRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
@@ -47,7 +48,7 @@ public class CoursesController {
         ctx.render("courses/build.jte", Collections.singletonMap("page", page));
     }
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws SQLException {
         var name = ctx.formParam("name");
         var description = ctx.formParam("description");
         try {
@@ -71,7 +72,7 @@ public class CoursesController {
         }
     }
 
-    public static void edit(Context ctx) {
+    public static void edit(Context ctx)  throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var course = CourseRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Entity with id = " + id + " not found"));
@@ -79,7 +80,7 @@ public class CoursesController {
         ctx.render("courses/edit.jte", Collections.singletonMap("page", page));
     }
 
-    public static void update(Context ctx) {
+    public static void update(Context ctx)  throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
 
         var name = ctx.formParam("name");
@@ -94,7 +95,7 @@ public class CoursesController {
         ctx.redirect(NamedRoutes.coursesPath());
     }
 
-    public static void destroy(Context ctx) {
+    public static void destroy(Context ctx)  throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         CourseRepository.delete(id);
         ctx.redirect(NamedRoutes.coursesPath());

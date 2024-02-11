@@ -10,10 +10,37 @@ import org.example.hexlet.model.User;
 import org.example.hexlet.repository.CourseRepository;
 import org.example.hexlet.repository.UserRepository;
 import org.example.hexlet.utils.NamedRoutes;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.Collections;
+import java.util.stream.Collectors;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.example.hexlet.repository.BaseRepository;
 
 public class HelloWorld {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+
+        var hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+
+        var dataSource = new HikariDataSource(hikariConfig);
+
+        var url = HelloWorld.class.getClassLoader().getResource("schema.sql");
+        var file = new File(url.getFile());
+        var sql = Files.lines(file.toPath())
+                .collect(Collectors.joining("\n"));
+
+        // Получаем соединение, создаем стейтмент и выполняем запрос
+        try (var connection = dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+
+        BaseRepository.dataSource = dataSource;
 
         var course1 = new Course("Java", "Fantastic Java course");
         var course2 = new Course("Python", "Amazing Python course");
